@@ -1,19 +1,28 @@
 import { Message } from "@/lib/openai/chatMessage";
 import { fetchAssistantResponse } from "@/lib/openai/fetchAssistantResponse";
-import { useState } from "react";
+import { useReducer, useRef, useState } from "react";
 import ChatMessage, { ChatMessageProps } from "./ChatMessage";
 import Image from "next/image";
 
 export default function Chat() {
   const [messages, setMessages] = useState<ChatMessageProps[]>([]);
   const [userInput, setUserInput] = useState<string>("");
+  const hasMessages = messages.length > 0;
+
+  const handlePickSuggestion = (text: string) => {
+    sendMessage(text);
+  };
 
   async function handleSubmitMessage() {
+    sendMessage(userInput);
+    setUserInput(() => "");
+  }
+
+  async function sendMessage(text: string) {
     const userMessage: Message = {
       role: "user",
-      content: userInput,
+      content: text,
     };
-    setUserInput(() => "");
     const conversationSoFar = [...messages, userMessage];
     setMessages((prev) => [...prev, userMessage]);
     const responseMessage = await fetchAssistantResponse(conversationSoFar);
@@ -36,11 +45,37 @@ export default function Chat() {
       </div>
       <div id="texts" className="flex-grow overflow-hidden">
         <div className="w-full max-w-[800px] h-full mx-auto bg-opacity-45 overflow-auto">
-          <div className="flex flex-col gap-4 p-4">
-            {messages.map((msg) => (
-              <ChatMessage key={msg.content} {...msg} />
-            ))}
-          </div>
+          {hasMessages ? (
+            <div className="flex flex-col gap-4 p-4">
+              {messages.map((msg) => (
+                <ChatMessage key={msg.content} {...msg} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col  h-full w-full gap-4 p-4 justify-center items-center">
+              <h1 className="text-orange-500">Other users are asking:</h1>
+              <button
+                onClick={() =>
+                  handlePickSuggestion(
+                    "What is the difference between leasing and renting?"
+                  )
+                }
+                className="border border-zinc-600 px-3 py-1 rounded-lg bg-white bg-opacity-10 text-zinc-600 text-opacity-70 shadow-lg hover:scale-105 transition-all duration-200"
+              >
+                What is the difference between leasing and renting?
+              </button>
+              <button
+                onClick={() =>
+                  handlePickSuggestion(
+                    "I need advice setting up my savings account."
+                  )
+                }
+                className="border border-zinc-600 px-3 py-1 rounded-lg bg-white bg-opacity-10 text-zinc-600 text-opacity-70 shadow-lg hover:scale-105 transition-all duration-200"
+              >
+                I need advice setting up my savings account.
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <div id="input" className="flex-shrink-0">
