@@ -1,1 +1,1 @@
-# gdsc-ai-hack-fermiparadox
+![Money.Me Logo](./frontent/public/logo.png)
