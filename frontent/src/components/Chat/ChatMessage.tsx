@@ -10,7 +10,13 @@ export default function ChatMessage(props: ChatMessageProps) {
     return (
       <div className="relative h-max p-2 max-w-[600px] text-left">
         <div className="absolute top-0 -left-2 w-[3px] h-full flex-shrink-0 bg-gradient-to-b from-massi-start via-massi-mid to-massi-end" />
-        <div className="text-sm">{props.content}</div>
+        <div className="text-sm">
+          {props.content.split("\n").map((line, idx) => (
+            <p key={`${line}_${idx}`} className="mb-2 last:mb-0">
+              {line}
+            </p>
+          ))}
+        </div>
       </div>
     );
 
